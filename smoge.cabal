@@ -1,0 +1,93 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.33.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: cd354ec2d2c6e04b069bcc87909e74720e6daf89b105945503b34cfd869b5195
+
+name:           smoge
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/githubuser/smoge#readme>
+homepage:       https://github.com/ArcSecant/smoge#readme
+bug-reports:    https://github.com/ArcSecant/smoge/issues
+author:         ArcSecant
+maintainer:     ArcSecant
+copyright:      2021 ArcSecant
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    ChangeLog.md
+
+source-repository head
+  type: git
+  location: https://github.com/ArcSecant/smoge
+
+library
+  exposed-modules:
+      App
+      Requests
+  other-modules:
+      Paths_smoge
+  hs-source-dirs:
+      backend/src
+  build-depends:
+      aeson
+    , base
+    , http-client
+    , http-client-tls
+    , servant
+    , servant-client
+    , servant-server
+    , transformers
+    , wai
+    , warp
+    , warp-tls
+  default-language: Haskell2010
+
+executable smoge-exe
+  main-is: Main.hs
+  other-modules:
+      Paths_smoge
+  hs-source-dirs:
+      backend/app
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base
+    , http-client
+    , http-client-tls
+    , servant
+    , servant-client
+    , servant-server
+    , smoge
+    , transformers
+    , wai
+    , warp
+    , warp-tls
+  default-language: Haskell2010
+
+test-suite smoge-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_smoge
+  hs-source-dirs:
+      backend/test
+  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base
+    , http-client
+    , http-client-tls
+    , servant
+    , servant-client
+    , servant-server
+    , smoge
+    , transformers
+    , wai
+    , warp
+    , warp-tls
+  default-language: Haskell2010

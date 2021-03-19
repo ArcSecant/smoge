@@ -1,0 +1,13 @@
+.stack-work/
+.parcel-cache/
+.spago/
+dist/
+node_modules/
+output/
+.psc-ide-port
+.purs-repl
+index.*
+package-lock.json
+*.lock
+hie.yaml
+*~
