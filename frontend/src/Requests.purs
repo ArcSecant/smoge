@@ -19,7 +19,7 @@ import Halogen.Aff as HA
 
 sendRequest :: String -> Aff String
 sendRequest mapId = do
-  response <- AX.get AXR.string ("http://localhost:3000?id=" <> mapId)
+  response <- AX.get AXR.string ("/api/?id=" <> mapId)
   case response of
     Right success -> pure $ success.body
     Left err -> pure $ AX.printError err

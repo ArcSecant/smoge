@@ -1,23 +1,24 @@
 module Main where
 
-import Prelude
 import Data.Array
-import Requests (sendRequest)
+import Data.Either
+import Data.Maybe
+import Json
+import Prelude
+import Affjax as AX
+import Affjax.ResponseFormat as AXR
+import Data.Argonaut (printJsonDecodeError)
+import Data.HTTP.Method (Method(..))
 import Effect (Effect)
 import Effect.Aff.Class (class MonadAff)
+import Effect.Class.Console (log)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Halogen.VDom.Driver (runUI)
-import Affjax as AX
-import Affjax.ResponseFormat as AXR
-import Data.Either
-import Data.Maybe
-import Effect.Class.Console (log)
-import Data.HTTP.Method (Method(..))
-import Data.Argonaut.Core (stringify, fromString)
+import Requests (sendRequest)
 
 main :: Effect Unit
 main =
@@ -27,7 +28,7 @@ main =
 
 type State
   = { mapId :: String
-    , mapInfo :: Array (Maybe String)
+    , mapInfo :: Array MapInfo
     }
 
 data Action
@@ -48,7 +49,8 @@ initialState _ = { mapId: "", mapInfo: [] }
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
   HH.div_
-    [ HH.text (show state.mapInfo)
+    -- [ HH.div_ $ map (\x -> HH.text x.mapName) state.mapInfo
+    [ HH.text $ show $ state.mapInfo
     , HH.div_
         [ HH.input
             [ HP.value state.mapId
@@ -63,9 +65,13 @@ render state =
     ]
 
 handleAction ∷ forall o m. MonadAff m => Action → H.HalogenM State Action () o m Unit
-handleAction = case _ of
-  HandleInput val -> do
-    H.modify_ (_ { mapId = val })
-  SendReq mapId -> do
-    m <- H.liftAff $ AX.get AXR.string ("/api/?id=" <> mapId)
-    H.modify_ \st -> st { mapInfo = map _.body (hush m) : st.mapInfo }
+handleAction (HandleInput val) = do
+  H.modify_ (_ { mapId = val })
+
+handleAction (SendReq mapId) = do
+  response <- H.liftAff $ AX.request (AX.defaultRequest { url = ("/api/?id=" <> mapId), method = Left GET, responseFormat = AXR.json })
+  case response of
+    Left err -> H.modify_ \st -> st { mapInfo = emptyMapInfo : st.mapInfo }
+    Right success -> case mapInfoFromJson success.body of
+      Left err -> H.modify_ \st -> st { mapInfo = emptyMapInfo : st.mapInfo }
+      Right m -> H.modify_ \st -> st { mapInfo = m : st.mapInfo }
